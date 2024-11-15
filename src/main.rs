@@ -23,12 +23,6 @@ use std::io::{Write, BufReader, BufRead};
 * a rustlang application to generate and scaffold the pangenome from the hifi reads either using
 * the hifiasm and then annotate the pangenome using the given protein and then extract the aligned
 * regions from the annotated pangenome.
-*  git clone https://github.com/chhylp123/hifiasm
-cd hifiasm && make
-wget https://github.com/chhylp123/hifiasm/releases/download/v0.7/chr11-2M.fa.gz
-./hifiasm -o test -t4 -f0 chr11-2M.fa.gz 2> test.log
-awk '/^S/{print ">"$2;print $3}' test.bp.p_ctg.gfa > test.p_ctg.fa
-*
 * */
 
 fn main() {
@@ -44,7 +38,16 @@ fn pangenome(path: &str, genome: &str, thread: &i32, proteinfasta: &str) -> Resu
     run_cmd!("git clone https://github.com/chhylp123/hifiasm");
     run_cmd!("cd hifiasm && make");
     let reads = &path.to_string();
-    run_cmd!("./hifiasm -o &genome -t &thread -f0 &reads")
+    let genomeassembly = Command::new("./hifiasm")
+        .arg("-o genome")
+        .arg("-t &thread")
+        .arg("-f0")
+        .arg(&reads)
+        .arg("2>")
+        .arg("genome-assembly.log")
+        .spawn()
+        .output()
+        .expect("hifiasm failed to run the assembly")
 }
 
 fn make_fasta() {
