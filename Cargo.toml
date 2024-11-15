@@ -8,3 +8,4 @@ clap = { version = "4.5.20", features = ["derive"] }
 cmd_lib = "1.9.5"
 polars = "0.44.2"
 rayon = "1.10.0"
+shellfn = "0.1.1"

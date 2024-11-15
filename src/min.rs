@@ -44,7 +44,16 @@ fn pangenome(path: &str, genome: &str, thread: &i32, proteinfasta: &str) -> Resu
     run_cmd!("git clone https://github.com/chhylp123/hifiasm");
     run_cmd!("cd hifiasm && make");
     let reads = &path.to_string();
-    run_cmd!("./hifiasm -o &genome -t &thread -f0 &reads")
+    let genomeassembly = Command::new("./hifiasm")
+        .arg("-o genome")
+        .arg("-t &thread")
+        .arg("-f0")
+        .arg(&reads)
+        .arg("2>")
+        .arg("genome-assembly.log")
+        .spawn()
+        .output()
+        .expect("hifiasm failed to run the assembly")
 }
 
 fn make_fasta() {
