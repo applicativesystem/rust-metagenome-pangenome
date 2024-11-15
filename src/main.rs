@@ -120,6 +120,17 @@ fn genome_annotation(proteinfasta: &str) {
 
 // started to code the actix web for the same. It will generate all API for the same.
 
+fn analyze_alignments(alignment: &str) {
+  let mut file = File::open(&).expect("file not found");
+  let mut reader = BufReader::new(&file);
+
+
+}
+
+
+
+
+
 fn actix_generate() {
 
 
