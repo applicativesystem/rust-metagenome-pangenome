@@ -1,5 +1,7 @@
 mod args;
+use std::mem;
 use std::env::set_current_dir;
+use std::collections::HashSet;
 use args::PangenomeArgs;
 use clap::Parser;
 use cmd_lib::run_cmd;
@@ -25,7 +27,7 @@ use std::process::Command;
 
 fn main() {
     let args = PangenomeArgs::parse();
-    pangenome(
+    pangenome_hifiasm(
         &args.reads_arg,
         &args.genome_arg,
         &args.thread_arg,
@@ -35,10 +37,11 @@ fn main() {
     genome_complete();
     genome_annotation(&args.protein_arg);
     analyze_mrna_alignments();
+    analyze_cds_alignments();
 }
 
 // assembling the genome for the pangenome - lifetime borrows
-fn pangenome<'a>(path: &'a str, genome: &'a str, thread: &'a i32, proteinfasta: &'a str) {
+fn pangenome_hifiasm<'a>(path: &'a str, genome: &'a str, thread: &'a i32, proteinfasta: &'a str) {
     fs::create_dir("pangenome_assemble");
     let assemblerpath = Path::new("./pangenome_assemble");
     set_current_dir(&assemblerpath);
@@ -153,9 +156,31 @@ fn analyze_mrna_alignments() {
          }
        }
 }
-fn analzye_cds_alignments<'a>(alignment: & 'a str) {
+fn analyze_cds_alignments<'a>() {
+    #[derive(Debug,Clone, PartialEq)]
+    struct Coding {
+      parent_id: String,
+      cds_start: Vec<usize>,
+      cds_end: Vec<i32>,
+    }
+      let final_assembly = String::from("./pangenome/genome_completeness/final-genome-assembled.gff");
+      let mut parentid:HashSet<&str> = HashSet::new();
+      let mut file = File::open(&final_assembly).expect("file not present");
+      let mut fileread = BufReader::new(&file);
+      for line in fileread.lines(){
+         let genomesec = line.expect("file not present");
+         let genomepart = genomesec.split(" ").collect::<Vec<&str>>()[2];
+         if genomepart =="mRNA"{
+                let idhold = &genomesec.split(" ").collect::<Vec<&str>>()[8];
+                let finalid = idhold.split(";").collect::<Vec<&str>>()[0];
+                let appenid = finalid.split("=").collect::<Vec<&str>>()[1];
+                let mut insertid = parentid.clone();
+                insertid.insert(appenid);
+         }
+      }
+}
 
-      let final_assembly =
-        String::from("./pangenome/genome_completeness/final-genome-assembled.fasta");
+// lifetime migration for the sql insert.
+fn sql_inject<'a>() {
 
 }
