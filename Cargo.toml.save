@@ -7,4 +7,3 @@ edition = "2021"
 clap = { version = "4.5.20", features = ["derive"] }
 cmd_lib = "1.9.5"
 rayon = "1.10.0"
-sqlite3 = "0.24.0"
